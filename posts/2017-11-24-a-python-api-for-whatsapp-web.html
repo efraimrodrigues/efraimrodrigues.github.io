@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>A Python API for Whatsapp Web - Efraim Rodrigues</title>
+  <meta charset="utf-8" />
+  <link href="http://fonts.googleapis.com/css?family=Lato:400,900" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="../css/default.css" />
+  <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+</head>
+<body>
+    <header>
+      <hgroup>
+        <h1><a href="../">Efraim Rodrigues</a></h1>
+        <h2></h2>
+      </hgroup>
+    </header>
+    <nav>
+        <menu>
+            
+                <a href="../">Home</a>
+            
+
+            
+                <a class="is-active" href="../posts.html">Blog</a>
+            
+
+            <!--
+                <a href="/cv.html">CV</a>
+            -->
+
+            
+                <a href="../contact.html">Contact</a>
+            
+        </menu>
+    </nav>
+    <section>
+        <article>
+<header>
+<h1>A Python API for Whatsapp Web</h1>
+<p>by <em>Efraim Rodrigues</em> on <strong>November 24, 2017</strong></p>
+<p>Tagged as: <a href="../tags/python.html">python</a>, <a href="../tags/whatsapp.html">whatsapp</a>, <a href="../tags/javascript.html">javascript</a>.</p>
+</header>
+
+<section>
+<p><a href="http://whapy.readthedocs.io/en/latest/?badge=latest"><img src="https://readthedocs.org/projects/whapy/badge/?version=latest" alt="Documentation Status" /></a></p>
+<p>Available on <a href="http://github.com/efraimrodrigues/WhaPy" target="_blank">GitHub<img width="2%" src="../files/GitHub-Mark-64px.png" /></a></p>
+<h2 id="whapy-a-python-api-for-whatsapp-web">WhaPy: A Python API for Whatsapp Web</h2>
+<p>This article explains the basis of WhaPy a API for Whatsapp Web that allows chatbots to be created. Please refer to the <a href="http://whapy.readthedocs.io/">documentation</a> for detailed information on how to use it.</p>
+<h3 id="intro">Intro</h3>
+<p>Whatsapp has been claimed to be one of the most used conversation application in the western world. It seems whatsapp has not made plans for implementing an API (Application Programming Interface) in a near future. An API would allow developers to implement chatbots to provide automated services on it. Although whatsapp doesn’t seem willing to implement an API, whatsapp web seemed to make it possible for an unofficial API.</p>
+<h3 id="whatsapp-web">WhatsApp Web</h3>
+<p>Whatsapp Web is the whatsapp version for browsers, but it requires the mobile application to be online simultaneously. This version uses <a href="https://reactjs.org/">ReacJs</a> which is a JavaScript library for building applications’ interfaces.</p>
+<p><a href="https://reactjs.org/">ReacJs</a> defines a virtual DOM in order to perform updates in the DOM more efficiently. <a href="http://blog.reverberate.org/2014/02/react-demystified.html">Here’s</a> an explanation of React’s perks. Whatsapp Web’s architecture defines React on top of the architecture to make requests to lower layers. Then, the frontend Store is defined to provided a interface for this.</p>
+<h3 id="frontend-store">Frontend Store</h3>
+<p>The frontend Store defines a set of objects and functions to work with the architecture’s lower layers. Here’s a list of objects defined on the frontend Store:</p>
+<ul>
+<li>AllStarredMsgs</li>
+<li>Blocklist</li>
+<li>Call</li>
+<li>Chat</li>
+<li>ChatPreference</li>
+<li>Cmd</li>
+<li>Conn</li>
+<li>Contact</li>
+<li>ConversionTuple</li>
+<li>EmojiVariant</li>
+<li>GroupMetadata</li>
+<li>Location</li>
+<li>Msg</li>
+<li>MsgInfo</li>
+<li>Mute</li>
+<li>Presence</li>
+<li>ProfilePicThumb</li>
+<li>RecentEmoji</li>
+<li>ServerProps</li>
+<li>StarredGifMsgs</li>
+<li>Status</li>
+<li>StatusV3</li>
+<li>StatusV3Privacy</li>
+<li>Stream</li>
+<li>Wap</li>
+</ul>
+<p>Most of these objects are comprehensible by their names, and their functions are self explanatory. List of objects are usually store in the <i>models</i> attribute. For instance, using JavaScript, <i>Store.Chat.models</i> gives access to the list of chats and <i>Store.Chat.models[0].sendMessage(“Hello!”)</i> will send a message to the first chat. These objects could be seen as whatsapp classes’ managing beans. <i>Store.Chat</i> is the most used object in WhaPy and it’s used for listening to events, sending messages and managing chats.</p>
+<h3 id="whapy">WhaPy</h3>
+<p>WhaPy provides two events. They are <i>on_message</i> and <i>on_ready</i>. <i>on_message</i> is fired each time a new message is detected and <i>on_ready</i> is fired when all chats are loaded in the frontend store. Besides these two events, WhaPy also offers interfaces for managing chats and messages.</p>
+<h4 id="on_message">on_message</h4>
+<p>This event watches chats via JavaScript (this will be addressed in the next topics). Once the JavaScript code detects an unread message in a chat, the routine will invoke a method for handling unread messages.</p>
+<h4 id="on_ready">on_ready</h4>
+<p>Because the whatsapp web page is not loaded completely at once, this event is fired each time the chats objects are present in the page.</p>
+<p>For handling a whatsapp web session WhaPy uses the <a href="http://selenium-python.readthedocs.io/">selenium</a> library for managing the page via JavaScript. Selenium allows WhaPy to open a web browser and control it with JavaScript code. Perhaps the most beautiful thing about selenium is that it allows objects to go from JavaScript to Python.</p>
+</section>
+</article>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://erodrigues.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!--
+<section>
+<div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'efraimrodrigues',
+                disqus_url = window.location.href.split('/').splice(0,3).join("/")+'/posts/2017-11-24-a-python-api-for-whatsapp-web.html';
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+-->
+    </section>
+    <footer>
+        <p style="font-size: small;">
+        
+        <a href="http://github.com/efraimrodrigues/" target="_blank">GitHub<img width="2%" src="../files/GitHub-Mark-64px.png" /></a> -
+        <a href="https://play.google.com/store/apps/developer?id=Efraim%20Rodrigues" target="_blank">Published Apps</a> -
+        <a href="http://github.com/efraimrodrigues/blog">Source code</a> -
+        <a href="http://jaspervdj.be/hakyll/index.html">Generated with Hakyll</a>
+        </p>
+        <!--<p>
+            <h4>BTC</h4>
+            <img src="/files/bitcoin.png" alt="bitcoin" />
+        </p>-->
+        <p>
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a>
+        </p>
+
+    </footer>
+</body>
+</html>

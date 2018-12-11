@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>An online end-to-end encryption chat application using Java RMI - Efraim Rodrigues</title>
+  <meta charset="utf-8" />
+  <link href="http://fonts.googleapis.com/css?family=Lato:400,900" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="../css/default.css" />
+  <link rel="stylesheet" type="text/css" href="../css/syntax.css" />
+</head>
+<body>
+    <header>
+      <hgroup>
+        <h1><a href="../">Efraim Rodrigues</a></h1>
+        <h2></h2>
+      </hgroup>
+    </header>
+    <nav>
+        <menu>
+            
+                <a href="../">Home</a>
+            
+
+            
+                <a class="is-active" href="../posts.html">Blog</a>
+            
+
+            <!--
+                <a href="/cv.html">CV</a>
+            -->
+
+            
+                <a href="../contact.html">Contact</a>
+            
+        </menu>
+    </nav>
+    <section>
+        <article>
+<header>
+<h1>An online end-to-end encryption chat application using Java RMI</h1>
+<p>by <em>Efraim Rodrigues</em> on <strong>October 23, 2017</strong></p>
+<p>Tagged as: <a href="../tags/java.html">java</a>, <a href="../tags/rmi.html">rmi</a>, <a href="../tags/encryption.html">encryption</a>.</p>
+</header>
+
+<section>
+<p>Available on <a href="http://github.com/efraimrodrigues/chatRMI" target="_blank">GitHub<img width="2%" src="../files/GitHub-Mark-64px.png" /></a></p>
+<h2 id="an-online-end-to-end-encryption-chat-application-using-java-rmi">An online end-to-end encryption chat application using Java RMI</h2>
+<h3 id="intro">Intro</h3>
+<p>Let’s take the typical Alice and Bob scenario for instance. In this scenario Bob wants to communicate with Alice in a secure way. A client/server application is enough to satisfy Alice’s and Bob’s needs. However, end to end encryption will be used to ensure a man-in-the-middle attack is not feasible. So, this will be a real time chat which will have its messages centralized in the server. The centralized messages must be encrypted in a way only the clients are able to decipher them. Sender and receiver information will be encrypted too.</p>
+<p>Server and clients are set with a symmetric key so they can safely exchange identity and asymmetric keys. As a result of this it will be impossible for a sniffer to identify clients and public keys. To address the process of identifying and communication between users and servers, each user will generate a pair of asymmetric keys locally and will share their public keys with the server service. It is important to mention that this communication will be done with a symmetric encryption technique. So, even if somehow a sniffer puts hands on the symmetric key, this sniffer might be able to decrypt one’s public key. But will never be able to decrypt a message because the end user is the only one able to do that with its private key (which was never shared).</p>
+<blockquote>
+<p>Symmetric Encryption Technique: AES</p>
+</blockquote>
+<blockquote>
+<p>Asymmetric Encryption Technique: RSA</p>
+</blockquote>
+<h3 id="java-rmi">Java RMI</h3>
+<p>All the communication is done over the Java RMI interface. RMI stands for Remote Method Invocation. This programming interface allows you to invoke remote classes’ methods. Most of Java RMI applications implement two applications, server and client. The server application will hold a server object and allow clients to use its methods. Client applications are required to have access to the objects interface, so they are oblivious to the way these methods are implemented.</p>
+<p>Java RMI classes must extends from the <code>java.rmi.Remote</code> class.</p>
+<h2 id="implementation">Implementation</h2>
+<hr />
+<h3 id="server-side">Server side</h3>
+<p>Server available on <a href="https://github.com/efraimrodrigues/chatRMI/tree/master/src/serverrmi" target="_blank">GitHub<img width="2%" src="../files/GitHub-Mark-64px.png" /></a></p>
+<p>As stated before, Java RMI applications implement a client and server. Before proceeding to the central object of the server, let’s lay eyes on <code>ChatConUserInterface</code>. This interface represents a user.</p>
+<pre><code>public interface ChatConUserInterface extends Remote,Serializable  {
+	abstract protected void enviarMensagem(String mensagem) throws RemoteException;
+	abstract protected ArrayList&lt;String&gt; getMensagens() throws RemoteException;
+	abstract protected String getPublicKey() throws RemoteException;
+	abstract protected Integer getContador() throws RemoteException;
+}</code></pre>
+<p>1.<code>abstract void enviarMensagem(String mensagem) throws RemoteException;</code></p>
+<p>This method gets and adds a message to the user’s mailbox or buffer represented by a list of strings. These strings shall be consumed by the client application.</p>
+<p>2.<code>abstract ArrayList<String> getMensagens() throws RemoteException;</code></p>
+<p>This will simply return the buffer of messages.</p>
+<p>3.<code>abstract String getPublicKey() throws RemoteException;</code></p>
+<p>User’s public key will be retreived by other user’s for encryption</p>
+<p>4.<code>abstract Integer getContador() throws RemoteException;</code></p>
+<p>Returns the current size of the buffer</p>
+<p>In addition, the central object of the server is the class ChatCon which is an implementation of ChatConInterface as follows:</p>
+<pre><code>public interface ChatConInterface extends Remote {
+	abstract public void enviarMensagem(String user, String mensagem) throws RemoteException;
+	abstract public ChatConUserInterface adicionaUsuario(String username, String publicKey) throws RemoteException;
+	abstract public void removeUsuario(String username) throws RemoteException;
+	abstract public ArrayList&lt;String&gt; getUsuarios() throws RemoteException;
+	abstract public String getPublicKey(String username) throws RemoteException;
+	abstract public boolean isOnline(String username) throws RemoteException;
+}</code></pre>
+<p>This interface supports simple operations:</p>
+<p>1.<code>abstract public void enviarMensagem(String user, String mensagem) throws RemoteException;</code></p>
+<p>Gets the username and encrypted message (receiver’s private key) and forwards to the user</p>
+<p>2.<code>abstract public ChatConUserInterface adicionaUsuario(String username, String publicKey) throws RemoteException;</code></p>
+<p>Instantiates and returns a <code>ChatConUser</code>. Used for a user to login</p>
+<p>3.<code>abstract public void removeUsuario(String username) throws RemoteException;</code></p>
+<p>Removes the specific user from the list of users. It’s used to logout</p>
+<p>4.<code>abstract public ArrayList<String> getUsuarios() throws RemoteException;</code></p>
+<p>Returns the list of logged in users.</p>
+<p>5.<code>abstract public String getPublicKey(String username) throws RemoteException;</code></p>
+<p>Returns the public key of a certain user</p>
+<p>6.<code>abstract public boolean isOnline(String username) throws RemoteException;</code></p>
+<p>Simply returns true if user is online, false otherwise</p>
+<h3 id="client-side">Client side</h3>
+<p>Client available on <a href="https://github.com/efraimrodrigues/chatRMI/tree/master/src/chatrmi" target="_blank">GitHub<img width="2%" src="../files/GitHub-Mark-64px.png" /></a></p>
+<p>Perhaps the client side application is the simplest one because it will only use what is already implemented. For this, it is only required that <code>ChatConInterface</code> and <code>ChatConUserInterface</code> are visible. The client application was built upon the JavaFX platform.</p>
+<div class="figure">
+<img src="../files/rmiclient.png" alt="RMI Client Application" />
+<p class="caption">RMI Client Application</p>
+</div>
+</section>
+</article>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://erodrigues.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!--
+<section>
+<div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'efraimrodrigues',
+                disqus_url = window.location.href.split('/').splice(0,3).join("/")+'/posts/2017-10-23-an-online-endtoend-encryption-chat-application-using-java-rmi.html';
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+-->
+    </section>
+    <footer>
+        <p style="font-size: small;">
+        
+        <a href="http://github.com/efraimrodrigues/" target="_blank">GitHub<img width="2%" src="../files/GitHub-Mark-64px.png" /></a> -
+        <a href="https://play.google.com/store/apps/developer?id=Efraim%20Rodrigues" target="_blank">Published Apps</a> -
+        <a href="http://github.com/efraimrodrigues/blog">Source code</a> -
+        <a href="http://jaspervdj.be/hakyll/index.html">Generated with Hakyll</a>
+        </p>
+        <!--<p>
+            <h4>BTC</h4>
+            <img src="/files/bitcoin.png" alt="bitcoin" />
+        </p>-->
+        <p>
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a>
+        </p>
+
+    </footer>
+</body>
+</html>
